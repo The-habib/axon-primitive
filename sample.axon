@@ -1,0 +1,20 @@
+{
+  "version": "AXON/1.0",
+  "uri": "axon://payload/509176665aff3b88",
+  "contentHash": "509176665aff3b880a3f0268403e9a159b800c6f354c3f1d4bfcc9853e0d3e8e",
+  "timestamp": 1786494594601,
+  "data": {
+    "val": 100,
+    "record_count": 5
+  },
+  "schema": {
+    "val": "number",
+    "record_count": "number"
+  },
+  "invariants": [
+    "val > 0",
+    "record_count >= 1"
+  ],
+  "nodeId": "axon_node_01",
+  "signature": "b2f0bf369d4aec64b9447e478c45de9120765582acd7598314f7d4bb332f1cadded3f9fa9f47881b3027ee3c7f755e4d23827c5c657d0a0859c69f8ea1f26e0b"
+}
