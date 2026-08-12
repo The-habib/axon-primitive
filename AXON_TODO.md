@@ -1,0 +1,20 @@
+# AXON Master TODO & Priority Matrix (AXON_TODO.md)
+
+## P0 — Critical (Production Release Blockers)
+- [x] Implement AXON Core Model (`docs/AXON_CORE_MODEL.md`)
+- [x] Implement Stack-Bounded AXON Predicate Language VM (`src/predicate/`)
+- [x] Implement 4-State Verification System (`TRUE`, `FALSE`, `UNKNOWN`, `UNVERIFIED`)
+- [x] Build 500 Deterministic Conformance Vectors (`conformance/vectors/`)
+- [x] Build 250 Hostile Security & Fuzzing Scenarios (`security/`)
+- [x] Implement 4 Multi-Language Engines (Python, TypeScript, Rust, WebAssembly)
+
+## P1 — Important (Developer Experience & System Infrastructure)
+- [x] Implement `axon query` engine & CLI (`src/cli.ts`)
+- [x] Implement Invariant-Preserving Transformation Triples ($T: A \to B$)
+- [x] Implement Contract Algebra ($C_2 \sqsubseteq C_1$, conjunction, disjunction)
+- [x] Implement 20 Production Workloads (`examples/production/`)
+
+## P2 — Useful (Documentation & Audits)
+- [x] Complete Security Audit (`SECURITY_AUDIT.md`) & Threat Model (`SECURITY_MODEL.md`)
+- [x] Complete Master Invention Audit (`FINAL_INVENTION_AUDIT.md`)
+- [x] Complete Master Final Report (`AXON_FINAL_REPORT.md`)

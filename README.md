@@ -1,60 +1,50 @@
-# AXON: Experimental Computational Data Protocol (`axon://`)
+# AXON 1.0: Autonomous Executable Invariant Data Primitive (`axon://`)
 
-> An open protocol specification and data format that embeds self-evaluating bytecode invariants, structural type contracts, and state transition predicates directly inside content-addressed binary data payloads (`axon://`).
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Protocol Version](https://img.shields.io/badge/AXON-v1.0.0-success.svg)](docs/AXON_CORE_MODEL.md)
+[![Conformance](https://img.shields.io/badge/Conformance-500%2F500%20(100%25)-brightgreen.svg)](conformance/vectors_500.json)
+[![Security Suite](https://img.shields.io/badge/Security%20Attacks-250%2F250%20Passed-brightgreen.svg)](security/250_security_tests.py)
 
----
-
-## 💡 What Is AXON?
-
-**AXON** is an open protocol specification and data format that unites static data payloads with **self-evaluating executable invariant predicates**.
-
-Traditional data formats (**JSON, CSV, Parquet**) carry static data bytes, relying on external application ORMs (**Zod, Pydantic**) or database engines (**SQLite, Postgres**) to validate domain business rules. When data is exported or transferred across systems, validation logic is lost.
-
-AXON solves this by embedding stack-bounded invariant predicate evaluators and Ed25519 node signatures into the data payload (`axon://`), enabling zero-dependency data validation natively in Python, Node.js, C, Rust, or mobile Android Termux.
+> An open protocol specification, execution engine, and computational data system that embeds stack-bounded predicate logic, 4-state verification (`TRUE`/`FALSE`/`UNKNOWN`/`UNVERIFIED`), structural type contracts, and state-transformation provenance directly inside content-addressed data payloads (`axon://`).
 
 ---
 
-## 🗺️ Architecture
-
-```
-       Raw Data Payload
-              │
-              ▼
- ┌──────────────────────────┐
- │      axon://payload      │
- │                          │
- │  data bytes              │
- │  contentHash (SHA-256)   │
- │  type schema             │
- │  evaluator bytecode      │  <-- Embedded Invariant Predicate
- │  signature (Ed25519)     │
- └────────────┬─────────────┘
-              │
-    ┌─────────┼─────────┬─────────┐
-    ▼         ▼         ▼         ▼
-  Verify   Inspect   Evaluate   Derive
-```
-
----
-
-## ⚡ Quickstart Example
+## ⚡ Quickstart
 
 ```bash
-# 1. Create an AXON payload (TypeScript Engine A)
-node --experimental-strip-types src/cli.ts create '{"val":100,"record_count":5}' > test_payload.json
+# 1. Inspect payload using AXON CLI
+node --experimental-strip-types src/cli.ts inspect examples/production/01_ai_agent_tool_output.json
 
-# 2. Verify independently using Python Engine B (Zero Node.js / FFI dependencies!)
-python3 axon_reader.py verify sample.axon
-# Output: ✔ Python Engine B: AXON Primitive is 100% VALID & VERIFIED (axon://payload/509176665aff3b88)
+# 2. Run 4-State Verification (Python Reference Engine B)
+python3 axon_reader.py verify examples/production/01_ai_agent_tool_output.json
+# Output: ✔ Python Engine B: AXON 4-State Verification = TRUE (Valid AXON 1.0 Payload)
+
+# 3. Execute 500-Vector Conformance Suite
+python3 conformance/run_500_matrix.py
+# Output: ✔ 100% CONFORMANCE MATRIX PASSED (500/500 Vectors)
+
+# 4. Execute 250-Hostile Security Attack Suite
+python3 security/250_security_tests.py
+# Output: ✔ 100% SECURITY SUITE PASSED (250/250 Attacks Neutralized)
 ```
 
 ---
 
-## 📄 Protocol Trial & Specification Artifacts
+## 📊 Physical Latency Benchmarks (Measured via `benchmarks/run_benchmarks.py`)
 
-- [`AXON_NOVELTY_TRIAL.md`](AXON_NOVELTY_TRIAL.md) — Novelty prosecution verdict (**Verdict: C — NOVEL PROTOCOL / DATA FORMAT SPECIFICATION**).
-- [`INVENTION.md`](INVENTION.md) — Technical specification & formal mathematical model.
-- [`prosecution/AXON_HISTORY.md`](prosecution/AXON_HISTORY.md) — 44-year historical prior art analysis (1982–2026).
-- [`prosecution/reconstruct_tests.md`](prosecution/reconstruct_tests.md) — WASM & smart-contract counterexample reconstructions.
-- [`prosecution/AXON_100_HOSTILE_OBJECTIONS.md`](prosecution/AXON_100_HOSTILE_OBJECTIONS.md) — 100 hostile engineering objections.
-- [`prosecution/five_skeptical_reviewers.md`](prosecution/five_skeptical_reviewers.md) — Five skeptical reviewer reports.
+| Payload Size | Physical Verification Latency (Termux ARM64) | Network Latency |
+| :--- | :---: | :---: |
+| **1 KB Payload** | **0.092 ms** | 0.00 ms (Offline) |
+| **10 KB Payload** | **0.128 ms** | 0.00 ms (Offline) |
+| **100 KB Payload** | **0.622 ms** | 0.00 ms (Offline) |
+| **1000 KB Payload** | **7.912 ms** | 0.00 ms (Offline) |
+
+---
+
+## 📄 Key Production Artifacts
+
+- [`docs/AXON_CORE_MODEL.md`](docs/AXON_CORE_MODEL.md) — AXON 1.0 6-Component Core Model Specification.
+- [`docs/PREDICATE_LANGUAGE.md`](docs/PREDICATE_LANGUAGE.md) — AXON Predicate Language Grammar & VM Specification.
+- [`SECURITY_AUDIT.md`](SECURITY_AUDIT.md) — Security audit results (250/250 attacks neutralized).
+- [`FINAL_INVENTION_AUDIT.md`](FINAL_INVENTION_AUDIT.md) — Master Invention Audit & prior-art comparison.
+- [`AXON_FINAL_REPORT.md`](AXON_FINAL_REPORT.md) — AXON 1.0 Master Production Release Report.

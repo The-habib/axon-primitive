@@ -1,0 +1,26 @@
+{
+  "header": {
+    "version": "AXON/1.0",
+    "uri": "axon://production/546fd8a33fe5d1f0",
+    "contentHash": "3cdf1ba87a3096ea3939669d4d248aaf1888e3eac9e86c25ac00624333f06509",
+    "contractHash": "fb3de3754147aafccf1b43cca8123c7772086ddd6cd22989f1f0c16fc1ab0942",
+    "semanticHash": "546fd8a33fe5d1f044e775e907724b74cb4c8c4b9cffaef111ec4919eb1e2a54",
+    "timestamp": 1700000000,
+    "nodeId": "production_node"
+  },
+  "schema": {
+    "account_id": "string",
+    "amount": "number",
+    "balance_after": "number"
+  },
+  "invariants": [
+    "amount > 0",
+    "balance_after >= 0"
+  ],
+  "data": {
+    "account_id": "ACC_9981",
+    "amount": 250.0,
+    "balance_after": 1250.0
+  },
+  "signature": "ed25519_production_signature_envelope"
+}

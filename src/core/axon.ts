@@ -1,93 +1,152 @@
 import * as crypto from 'node:crypto';
+import { APVM, type VerificationState } from '../predicate/vm.ts';
+
+export interface AXONHeader {
+  version: string;     // "AXON/1.0"
+  uri: string;         // "axon://payload/<semanticHash>"
+  contentHash: string;
+  contractHash: string;
+  semanticHash: string;
+  timestamp: number;
+  nodeId: string;
+}
+
+export interface AXONTransformation {
+  transformationId: string;
+  precondition: string[];
+  postcondition: string[];
+  parentSemanticHash: string;
+}
 
 export interface AXONPayload {
-  version: string; // "AXON/1.0"
-  uri: string;     // "axon://payload/<hash>"
-  contentHash: string;
-  timestamp: number;
-  data: Record<string, any>;
+  header: AXONHeader;
   schema: Record<string, string>;
-  invariants: string[]; // e.g. ["val > 0", "record_count >= 1"]
-  nodeId: string;
+  invariants: string[];
+  data: Record<string, any>;
+  transformation?: AXONTransformation;
   signature: string;
 }
 
 export class AXONEngine {
-  public static canonicalize(data: Record<string, any>): string {
-    const keys = Object.keys(data).sort();
-    const sortedObj: Record<string, any> = {};
-    for (const key of keys) {
-      sortedObj[key] = data[key];
+  public static canonicalize(obj: any): string {
+    if (obj === null || obj === undefined) return 'null';
+    if (typeof obj !== 'object') return JSON.stringify(obj);
+    if (Array.isArray(obj)) {
+      return '[' + obj.map(item => this.canonicalize(item)).join(',') + ']';
     }
-    return JSON.stringify(sortedObj);
+    const keys = Object.keys(obj).sort();
+    const parts = keys.map(k => `${JSON.stringify(k)}:${this.canonicalize(obj[k])}`);
+    return '{' + parts.join(',') + '}';
   }
 
-  public static hashPayload(data: Record<string, any>): string {
-    const canonical = this.canonicalize(data);
-    return crypto.createHash('sha256').update(canonical, 'utf8').digest('hex');
+  public static computeContentHash(data: Record<string, any>): string {
+    const cData = this.canonicalize(data);
+    return crypto.createHash('sha256').update(cData, 'utf8').digest('hex');
   }
 
-  public static signPayload(hash: string, privateKeyPem?: string): { signature: string; publicKeyPem: string } {
+  public static computeContractHash(schema: Record<string, string>, invariants: string[]): string {
+    const cSchema = this.canonicalize(schema);
+    const cInv = this.canonicalize([...invariants].sort());
+    return crypto.createHash('sha256').update(`${cSchema}:${cInv}`, 'utf8').digest('hex');
+  }
+
+  public static computeSemanticHash(contentHash: string, contractHash: string, parentHash: string = ''): string {
+    return crypto.createHash('sha256').update(`${contentHash}:${contractHash}:${parentHash}`, 'utf8').digest('hex');
+  }
+
+  public static signHash(hash: string, privateKeyPem?: string): string {
     if (!privateKeyPem) {
-      const { privateKey, publicKey } = crypto.generateKeyPairSync('ed25519');
-      const sig = crypto.sign(null, Buffer.from(hash), privateKey).toString('hex');
-      return {
-        signature: sig,
-        publicKeyPem: publicKey.export({ type: 'spki', format: 'pem' }).toString()
-      };
+      const { privateKey } = crypto.generateKeyPairSync('ed25519');
+      return crypto.sign(null, Buffer.from(hash), privateKey).toString('hex');
     }
-    const sig = crypto.sign(null, Buffer.from(hash), privateKeyPem).toString('hex');
-    return { signature: sig, publicKeyPem: '' };
-  }
-
-  public static evaluateInvariants(data: Record<string, any>, invariants: string[]): { passed: boolean; failures: string[] } {
-    const failures: string[] = [];
-    for (const inv of invariants) {
-      try {
-        const keys = Object.keys(data);
-        const vals = Object.values(data);
-        const fn = new Function(...keys, `return Boolean(${inv});`);
-        const ok = fn(...vals);
-        if (!ok) failures.push(inv);
-      } catch (err: any) {
-        failures.push(`${inv} (Error: ${err.message})`);
-      }
-    }
-    return { passed: failures.length === 0, failures };
+    return crypto.sign(null, Buffer.from(hash), privateKeyPem).toString('hex');
   }
 
   public static createAXON(
     data: Record<string, any>,
     schema: Record<string, string>,
     invariants: string[] = [],
+    transformation?: AXONTransformation,
     nodeId: string = 'axon_node_01'
   ): AXONPayload {
-    const contentHash = this.hashPayload(data);
-    const { signature } = this.signPayload(contentHash);
+    const contentHash = this.computeContentHash(data);
+    const contractHash = this.computeContractHash(schema, invariants);
+    const parentHash = transformation ? transformation.parentSemanticHash : '';
+    const semanticHash = this.computeSemanticHash(contentHash, contractHash, parentHash);
+    const signature = this.signHash(semanticHash);
+
     return {
-      version: 'AXON/1.0',
-      uri: `axon://payload/${contentHash.substring(0, 16)}`,
-      contentHash,
-      timestamp: Date.now(),
-      data,
+      header: {
+        version: 'AXON/1.0',
+        uri: `axon://payload/${semanticHash.substring(0, 16)}`,
+        contentHash,
+        contractHash,
+        semanticHash,
+        timestamp: Date.now(),
+        nodeId
+      },
       schema,
       invariants,
-      nodeId,
+      data,
+      transformation,
       signature
     };
   }
 
-  public static verifyAXON(payload: AXONPayload): { valid: boolean; reason?: string } {
-    const expectedHash = this.hashPayload(payload.data);
-    if (expectedHash !== payload.contentHash) {
-      return { valid: false, reason: `Content hash mismatch: expected ${expectedHash}, got ${payload.contentHash}` };
+  public static verifyAXON(payload: AXONPayload): { state: VerificationState; failures: string[] } {
+    const expectedContentHash = this.computeContentHash(payload.data);
+    if (expectedContentHash !== payload.header.contentHash) {
+      return { state: 'FALSE', failures: [`Content hash mismatch: expected ${expectedContentHash}, got ${payload.header.contentHash}`] };
     }
 
-    const invResult = this.evaluateInvariants(payload.data, payload.invariants);
-    if (!invResult.passed) {
-      return { valid: false, reason: `Invariant evaluation failed: ${invResult.failures.join(', ')}` };
+    const expectedContractHash = this.computeContractHash(payload.schema, payload.invariants);
+    if (expectedContractHash !== payload.header.contractHash) {
+      return { state: 'FALSE', failures: [`Contract hash mismatch: expected ${expectedContractHash}, got ${payload.header.contractHash}`] };
     }
 
-    return { valid: true };
+    const parentHash = payload.transformation ? payload.transformation.parentSemanticHash : '';
+    const expectedSemanticHash = this.computeSemanticHash(expectedContentHash, expectedContractHash, parentHash);
+    if (expectedSemanticHash !== payload.header.semanticHash) {
+      return { state: 'FALSE', failures: [`Semantic hash mismatch: expected ${expectedSemanticHash}, got ${payload.header.semanticHash}`] };
+    }
+
+    if (!payload.signature) {
+      return { state: 'UNVERIFIED', failures: ['Signature envelope missing'] };
+    }
+
+    // Evaluate AP-VM Invariants
+    const evalResult = APVM.evaluateAll(payload.data, payload.invariants);
+    return evalResult;
+  }
+
+  public static transform(
+    parent: AXONPayload,
+    transformFn: (data: Record<string, any>) => Record<string, any>,
+    newSchema: Record<string, string>,
+    additionalInvariants: string[] = []
+  ): AXONPayload {
+    const newData = transformFn(parent.data);
+    const inheritedInvariants = parent.invariants.filter(inv => {
+      // Retain invariant if keys exist in new data
+      const keys = Object.keys(newData);
+      return keys.some(k => inv.includes(k));
+    });
+    const combinedInvariants = Array.from(new Set([...inheritedInvariants, ...additionalInvariants]));
+
+    const transformation: AXONTransformation = {
+      transformationId: `tf_${Date.now()}`,
+      precondition: parent.invariants,
+      postcondition: combinedInvariants,
+      parentSemanticHash: parent.header.semanticHash
+    };
+
+    return this.createAXON(newData, newSchema, combinedInvariants, transformation, parent.header.nodeId);
+  }
+
+  public static query(payloads: AXONPayload[], queryPredicate: string): AXONPayload[] {
+    return payloads.filter(p => {
+      const res = APVM.evaluateExpression(p.data, queryPredicate);
+      return res.state === 'TRUE';
+    });
   }
 }

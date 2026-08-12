@@ -1,0 +1,26 @@
+{
+  "header": {
+    "version": "AXON/1.0",
+    "uri": "axon://production/56ff24f6d43977b5",
+    "contentHash": "d5f70b3594c246364b641ecbb817455fb6c07f5cfefdd9eb77765687d4801e41",
+    "contractHash": "7f797e90d042736822f20a80f615fdc7d7300ca3f599bbc2a5f3e6f5295069e8",
+    "semanticHash": "56ff24f6d43977b57590370ac040de2058b403e5bcf453fa39009052039e8751",
+    "timestamp": 1700000000,
+    "nodeId": "production_node"
+  },
+  "schema": {
+    "device_id": "string",
+    "temp_celsius": "number",
+    "humidity": "number"
+  },
+  "invariants": [
+    "temp_celsius >= -40",
+    "temp_celsius <= 85"
+  ],
+  "data": {
+    "device_id": "sensor_arm64",
+    "temp_celsius": 22.5,
+    "humidity": 45.0
+  },
+  "signature": "ed25519_production_signature_envelope"
+}

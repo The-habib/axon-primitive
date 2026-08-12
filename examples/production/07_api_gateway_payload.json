@@ -1,0 +1,24 @@
+{
+  "header": {
+    "version": "AXON/1.0",
+    "uri": "axon://production/f45c2fc6ee7dbbc2",
+    "contentHash": "e39c1cfc57e641c84a5328654709f5203ac4b6119b8e111219d95631b7da254b",
+    "contractHash": "ca8830f3d63998e401cbd3d289de299771871aacac91fcffd210e367aa4f675d",
+    "semanticHash": "f45c2fc6ee7dbbc21e9d258deb3a92fc08fd19d39d9e85751709779b4ccf34ae",
+    "timestamp": 1700000000,
+    "nodeId": "production_node"
+  },
+  "schema": {
+    "status_code": "number",
+    "latency_ms": "number"
+  },
+  "invariants": [
+    "status_code == 200",
+    "latency_ms < 100"
+  ],
+  "data": {
+    "status_code": 200,
+    "latency_ms": 14.2
+  },
+  "signature": "ed25519_production_signature_envelope"
+}

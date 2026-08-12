@@ -1,0 +1,26 @@
+{
+  "header": {
+    "version": "AXON/1.0",
+    "uri": "axon://production/2e6d7bdf87195824",
+    "contentHash": "93deca1f42c6caf8b2ecfa52d152eef5ab50fd108478f34bd3410b6182fe2c9d",
+    "contractHash": "b7f9fa831955f5fe4fdb5bff442517d2ca1f4ecd0cf6851ade2ab7e6d53bc17c",
+    "semanticHash": "2e6d7bdf8719582462388db1e3b8481a74e17997b6e27c0377222d9e5257bfcf",
+    "timestamp": 1700000000,
+    "nodeId": "production_node"
+  },
+  "schema": {
+    "tool": "string",
+    "result": "number",
+    "confidence": "number"
+  },
+  "invariants": [
+    "confidence >= 0.95",
+    "result == 42"
+  ],
+  "data": {
+    "tool": "calculator",
+    "result": 42,
+    "confidence": 0.99
+  },
+  "signature": "ed25519_production_signature_envelope"
+}
