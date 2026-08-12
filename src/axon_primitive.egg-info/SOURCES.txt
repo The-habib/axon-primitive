@@ -1,0 +1,7 @@
+README.md
+pyproject.toml
+src/axon_primitive.egg-info/PKG-INFO
+src/axon_primitive.egg-info/SOURCES.txt
+src/axon_primitive.egg-info/dependency_links.txt
+src/axon_primitive.egg-info/entry_points.txt
+src/axon_primitive.egg-info/top_level.txt

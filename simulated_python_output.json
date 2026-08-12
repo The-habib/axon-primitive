@@ -1,0 +1,24 @@
+{
+  "header": {
+    "version": "AXON/1.0",
+    "uri": "axon://simulated/3e39c5a223bb3439",
+    "contentHash": "82fbc434c744ab089c8b63bd67f710d820ab171f3a70907aeffc1cc314569765",
+    "contractHash": "297c6d16ebc0c682f281db823a4cc42278976348d725e8d87da9c5a2c3872a5e",
+    "semanticHash": "3e39c5a223bb3439391f63c18b9343ebbef5965bdab873b94ed9b929e1395b42",
+    "timestamp": 1700000000,
+    "nodeId": "python_producer"
+  },
+  "schema": {
+    "val": "number",
+    "user": "string"
+  },
+  "invariants": [
+    "val > 100",
+    "user != ''"
+  ],
+  "data": {
+    "val": 500,
+    "user": "alice"
+  },
+  "signature": "simulated_python_signature"
+}

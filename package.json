@@ -1,0 +1,23 @@
+{
+  "name": "axon-primitive",
+  "version": "1.0.0",
+  "description": "Autonomous Executable Invariant Data Primitive Specification & Engine",
+  "main": "src/core/axon.ts",
+  "type": "module",
+  "bin": {
+    "axon": "src/cli.ts"
+  },
+  "scripts": {
+    "test": "python3 conformance/run_500_matrix.py && python3 security/250_security_tests.py",
+    "benchmark": "python3 benchmarks/run_benchmarks.py"
+  },
+  "keywords": [
+    "axon",
+    "protocol",
+    "data-invariants",
+    "verifiable-data",
+    "semantic-identity"
+  ],
+  "author": "The Habib",
+  "license": "MIT"
+}

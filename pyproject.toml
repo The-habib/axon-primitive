@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "axon-primitive"
+version = "1.0.0"
+description = "Autonomous Executable Invariant Data Primitive Specification & Engine"
+readme = "README.md"
+authors = [{ name = "The Habib", email = "research@axon-primitive.org" }]
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.8"
+dependencies = []
+
+[tool.setuptools]
+py-modules = ["axon_reader"]
+
+[project.scripts]
+axon-py = "axon_reader:main"
